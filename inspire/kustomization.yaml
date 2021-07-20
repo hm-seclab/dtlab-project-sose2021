@@ -1,0 +1,41 @@
+configMapGenerator:
+- name: serv-certs
+  files:
+    - database/certs/ca-cert.pem
+    - database/certs/envoyservice-key.pem
+    - database/certs/envoyservice-pub.pem
+- name: certs
+  files:
+    - backend/certs/ca-cert.pem
+    - backend/certs/envoyclient-key.pem
+    - backend/certs/envoyclient-pub.pem
+- name: backend-envoy
+  files:
+    - backend/config/envoy.yaml
+- name: postgres-envoy
+  files:
+    - database/config/envoy.yaml    
+generatorOptions:
+  disableNameSuffixHash: true
+
+secretGenerator:
+- name: postgres-credentials
+  files:
+  - password_files/postgres/database-host
+  - password_files/postgres/database-schema
+  - password_files/postgres/database-password
+  - password_files/postgres/database-user
+  - password_files/postgres/postgres-password
+  - password_files/postgres/postgres-user
+
+resources:
+  - database/postgres-deployment.yaml
+  - database/postgres-service.yaml
+  - database/postgres-storage.yaml
+  - backend/backend-service.yaml
+  - backend/backend-deployment.yaml
+  - frontend/frontend-service.yaml
+  - frontend/frontend-deployment.yaml
+  - proxy/ingress.yaml
+  - proxy/prod-issuer.yaml
+

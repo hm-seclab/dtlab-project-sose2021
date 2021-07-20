@@ -1,0 +1,7 @@
+keycloak-db/**
+realm-config/**
+.git/**
+deploy/**
+themes/target/**
+themes/src/main/resources/theme/hm-account/account/src/node_modules/**
+themes/node/**

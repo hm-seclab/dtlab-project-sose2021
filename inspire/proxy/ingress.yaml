@@ -1,0 +1,51 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-routes
+
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+#change to your domain
+    - web.yourdomain.com
+    secretName: cert-prod
+  rules:
+#change yourdomain.com to your domain
+  - host: web.yourdomain.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: backend
+              port: 
+                number: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-routes-www
+
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+#change to your domain
+    - www.yourdomain.com
+    secretName: cert-prod-www
+  rules:
+#change yourdomain.com to your domain
+  - host: www.yourdomain.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: frontend
+              port: 
+                number: 80

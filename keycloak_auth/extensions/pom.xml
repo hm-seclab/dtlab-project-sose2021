@@ -1,0 +1,22 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+
+	<name>Keycloak SPI Extensions</name>
+	<description/>
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+        <artifactId>keycloak-extensions</artifactId>
+        <groupId>edu.hm.cs.keycloak</groupId>
+        <version>13.0.1</version>
+    </parent>
+
+    <artifactId>keycloak-extensions-spi</artifactId>
+    <packaging>pom</packaging>
+
+	<modules>
+		<module>reset-webauthn</module>
+	</modules>
+
+</project>

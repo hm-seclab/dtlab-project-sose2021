@@ -1,0 +1,6 @@
+{
+    "themes": [ {
+        "name" : "hm-login",
+        "types": [ "login" ]
+    }]
+}

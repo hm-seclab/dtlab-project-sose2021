@@ -1,0 +1,20 @@
+@media (min-width: 600px) {
+    #dsgvo{
+        width: 500px;
+    }
+}
+@media (min-width: 900px) {
+    #dsgvo{
+        width: 800px;
+    }
+}
+@media (min-width: 1200px) {
+    #dsgvo{
+        width: 1100px;
+    }
+}
+@media (min-width: 1200px) {
+    #dsgvo{
+        width: 1100px;
+    }
+}

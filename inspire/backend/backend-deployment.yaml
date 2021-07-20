@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: backend
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: envoy
+        image: envoyproxy/envoy:v1.15.5
+        imagePullPolicy: Always
+        args: ["-l", "trace", "--local-address-ip-version", "v4", "-c", "/run/envoy/envoy.yaml", "--base-id", "1"]
+        volumeMounts:
+        - name: envoy-config
+          mountPath: "/run/envoy"
+          readOnly: true
+        - name: certs
+          mountPath: "/run/envoy/certs"
+          readOnly: true
+        - name: spire-agent-socket
+          mountPath: /run/spire/sockets
+          readOnly: true
+      - name: backend
+        imagePullPolicy: Always
+        image: yourdomain.com.dkr.ecr.eu-central-1.amazonaws.com/webapp-dev:backend-latest
+        env:
+          - name: DB_USER
+            value: "postgres"
+          - name: DB_PASSWORD
+            value: "postgres"
+          - name: DB_SCHEMA
+            value: "postgres"
+          - name: DB_HOST
+            value: "localhost"
+          - name: DB_PORT
+            value: "3001"
+        ports:
+        - containerPort: 3000
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "cd /usr/src/app && npm run migrate"] 
+      imagePullSecrets:
+      - name: regcred
+      volumes:
+      - name: certs
+        configMap:
+          name: certs
+      - name: envoy-config
+        configMap:
+          name: backend-envoy
+      - name: spire-agent-socket
+        hostPath:
+          path: /run/spire/sockets
+          type: Directory

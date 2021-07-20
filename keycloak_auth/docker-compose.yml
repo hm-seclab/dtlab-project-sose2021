@@ -1,0 +1,45 @@
+version: "3"  # optional since v1.27.0
+
+services:
+  keycloak:
+    build: .
+    volumes:
+      - ./realm-config:/opt/jboss/keycloak/realm-config
+      - ./keycloak-db:/opt/jboss/keycloak/standalone/data
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_FRONTEND_URL: https://auth.yourdomain.com/auth/
+      PROXY_ADDRESS_FORWARDING: "true"
+      JAVA_OPTS_APPEND: "-Dkeycloak.profile.feature.admin_fine_grained_authz=enabled"
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloak.rule=Host(`auth.yourdomain.com`)"
+      - "traefik.http.routers.keycloak.tls=true"
+      #- "traefik.http.routers.keycloak.entrypoints=websecure"
+      - "traefik.http.routers.keycloak.tls.certresolver=myresolver"
+      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+  traefik:
+    image: "traefik:v2.4"
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=your-email@yourdomain.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"

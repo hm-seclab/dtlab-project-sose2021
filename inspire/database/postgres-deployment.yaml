@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      nodeSelector:
+        nodetype: database 
+      containers:
+        - name: envoy
+          image: envoyproxy/envoy:v1.15.5
+          imagePullPolicy: Always
+          args: ["-l", "trace", "--local-address-ip-version", "v4", "-c", "/run/envoy/envoy.yaml"]
+          ports:
+          - containerPort: 9001
+          volumeMounts:
+          - name: serv-certs
+            mountPath: "/run/envoy/certs"
+            readOnly: true
+          - name: envoy-config
+            mountPath: "/run/envoy"
+            readOnly: true
+          - name: spire-agent-socket
+            mountPath: /run/spire/sockets
+            readOnly: true
+        - name: postgres
+          image: postgres:10.4          
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: database-user
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: database-password
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: postgres-user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: postgres-password 
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: database-host
+            - name: DB_SCHEMA
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: database-schema        
+        
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim
+        - name: serv-certs
+          configMap:
+            name: serv-certs
+        - name: envoy-config
+          configMap:
+            name: postgres-envoy
+        - name: spire-agent-socket
+          hostPath:
+            path: /run/spire/sockets
+            type: Directory

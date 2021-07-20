@@ -1,0 +1,74 @@
+node:
+  id: "postgres"
+  cluster: "microservices-cluster"
+admin:
+  access_log_path: /tmp/admin_access0.log
+  address:
+    socket_address:
+      protocol: TCP
+      address: 127.0.0.1
+      port_value: 4001
+static_resources:
+  listeners:
+  - name: local_service
+    address:
+      socket_address:
+        address: 0.0.0.0
+        port_value: 9001      
+    filter_chains:
+    - filters:
+      - name: envoy.filters.network.postgres_proxy
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy
+          stat_prefix: postgres
+      - name: envoy.tcp_proxy
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
+          stat_prefix: tcp
+          cluster: database
+      tls_context:
+        require_client_certificate: true
+        common_tls_context:
+          tls_certificate_sds_secret_configs:
+          - name: "spiffe://yourdomain.com/ns/default/sa/default/postgres"
+            sds_config:
+              api_config_source:
+                api_type: GRPC
+                grpc_services:
+                  envoy_grpc:
+                    cluster_name: spire_agent
+          combined_validation_context:
+            # validate the SPIFFE ID of incoming clients (optionally)
+            default_validation_context:
+              match_subject_alt_names:
+                - exact: "spiffe://yourdomain.com/ns/default/sa/default/backend"
+            # obtain the trust bundle from SDS
+            validation_context_sds_secret_config:
+              name: "spiffe://yourdomain.com"
+              sds_config:
+                api_config_source:
+                  api_type: GRPC
+                  grpc_services:
+                    envoy_grpc:
+                      cluster_name: spire_agent
+          tls_params:
+            ecdh_curves:
+              - X25519:P-256:P-521:P-384
+
+  clusters:
+  - name: spire_agent
+    connect_timeout: 0.25s
+    http2_protocol_options: {}
+    hosts:
+      - pipe:
+          path: /run/spire/sockets/agent.sock
+  - name: database
+    connect_timeout: 1s
+    type: strict_dns
+    load_assignment:
+      cluster_name: database
+      endpoints:
+        lb_endpoints:
+          endpoint:
+            address:
+              socket_address: { address: 127.0.0.1, port_value: 5432 }

@@ -1,0 +1,89 @@
+# docker-compose.yml
+
+version: "3.8"
+services:
+
+  # Backend Image (development)
+  backend:
+    container_name: backend-dev
+    hostname: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    environment:
+      DB_SCHEMA: ${DB_SCHEMA}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+    depends_on:
+      - database
+    ports:
+      - '3000:3000'
+
+
+  # Backend Image (production)
+#  backend:
+#    container_name: backend
+#    hostname: backend
+#    build:
+#      context: ./backend
+#      dockerfile: Dockerfile
+#    environment:
+#      DB_SCHEMA: ${DB_SCHEMA}
+#      DB_USER: ${DB_USER}
+#      DB_PASSWORD: ${DB_PASSWORD}
+#      DB_HOST: ${DB_HOST}
+#      DB_PORT: ${DB_PORT}
+#    depends_on:
+#      - database
+#    ports:
+#      - '3000:3000'
+
+
+#  # Frontend Image (development)
+  frontend:
+    container_name: frontend-dev
+    hostname: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    environment:
+      VUE_APP_BACKEND_URL: ${VUE_APP_BACKEND_URL}
+    volumes:
+      - ./frontend/public:/app/public
+      - ./frontend/src:/app/src
+      - ./frontend/babel.config.js:/app/babel.config.js
+      - ./frontend/package.json:/app/package.json
+      - ./frontend/package-lock.json:/app/package-lock.json
+      - ./frontend/vue.config.js:/app/vue.config.js
+    ports:
+      - '8080:8080'
+
+  # Frontend Image (production)
+#  frontend:
+#    container_name: frontend
+#    hostname: frontend
+#    build:
+#      context: ./frontend
+#      dockerfile: Dockerfile
+#      args:
+#        VUE_APP_BACKEND_URL: ${VUE_APP_BACKEND_URL}
+#    ports:
+#      - '80:80'
+
+  # Database Image (development and production)
+  database:
+    image: postgres
+    container_name: database
+    hostname: database
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - '${DB_PORT}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

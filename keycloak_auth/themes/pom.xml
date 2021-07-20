@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>keycloak-extensions</artifactId>
+        <groupId>edu.hm.cs.keycloak</groupId>
+        <version>13.0.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>keycloak-themes</artifactId>
+    <name>Keycloak Themes</name>
+    <description/>
+    <packaging>jar</packaging>
+
+    <build>
+        <plugins>
+            
+        </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/node_modules/rcue/**</exclude>
+                    <exclude>**/node_modules/**/node_modules/**</exclude>
+                    <exclude>**/minimist/**</exclude>
+                    <exclude>**/mkdirp/**</exclude>
+                    <exclude>**/package.json</exclude>
+                    <exclude>**/package-lock.json</exclude>
+                    <exclude>**/component.json</exclude>
+                    <exclude>**/composer.json</exclude>
+                    <exclude>**/npm-shrinkwrap.json</exclude>
+                    <exclude>**/select2.jquery.json</exclude>
+                    <exclude>**/*.markdown</exclude>
+                    <exclude>**/*.swf</exclude>
+                    <exclude>**/*.sh</exclude>
+                    <exclude>**/.bin/**</exclude>
+                    <exclude>**/bin/**</exclude>
+                    <exclude>**/build/**</exclude>
+                    <exclude>**/docs/**</exclude>
+                    <exclude>**/demo/**</exclude>
+                    <exclude>**/devtools/**</exclude>
+                    <exclude>**/example/**</exclude>
+                    <exclude>**/examples/**</exclude>
+                    <exclude>**/grunt/**</exclude>
+                    <exclude>**/less/**</exclude>
+                    <exclude>**/sass/**</exclude>
+                    <exclude>**/scss/**</exclude>
+                    <exclude>**/jquery/src/**</exclude>
+                    <exclude>**/angular-treeview/src/**</exclude>
+                    <exclude>**/test/**</exclude>
+                    <exclude>**/tests/**</exclude>
+                    <exclude>**/_config.yml</exclude>
+                    <exclude>**/api.md</exclude>
+                    <exclude>**/AUTHORS.txt</exclude>
+                    <exclude>**/CHANGELOG.md</exclude>
+                    <exclude>**/CONTRIBUTING.md</exclude>
+                    <exclude>**/HELP-US-OUT.txt</exclude>
+                    <exclude>**/README.md</exclude>
+                    <exclude>**/Gruntfile.js</exclude>
+                    <exclude>**/Gemfile*</exclude>
+                    <exclude>**/.*</exclude>
+                    
+                    <!-- Remove once rcue stops shipping this file -->
+                    <exclude>**/git-Logo.svg</exclude>
+                    
+                    <exclude>**/hm-account/account/src/**</exclude>
+                </excludes>
+            </resource>
+        </resources>
+    </build>
+
+</project>
